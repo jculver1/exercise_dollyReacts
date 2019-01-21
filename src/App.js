@@ -8,16 +8,41 @@ class App extends Component {
   constructor(props){
     super(props)
     this.state = {
-      wisdom: ''
+      songs: [],
+      title: '',
+      quote: '',
+      tags: [],
+      hasQuote: false
     }
   }
 
-  generateQuote = () => {
+  getRandomIntInclusive = (max) => {
+    const min = 0
+    max = this.state.songs.length - 1
+    return Math.floor(Math.random() * (max - min + 1)) + min;  
+  }
 
+  generateQuote = () => {
+    // e.preventDefault()
+    const randomIndex = this.getRandomIntInclusive(this.state.songs.length - 1)
+    const randomSong = this.state.songs[randomIndex]
+    this.setState({
+      hasQuote: true,
+      title: randomSong.title,
+      quote: randomSong.quote,
+      tags: randomSong.tags 
+    })
   }
 
   componentDidMount() {
-    // set data to state 
+    fetch('http://localhost:3000/data')
+      .then(data => data.json())
+      .then(JSONdata => {
+        console.log(JSONdata)
+        this.setState({
+          songs: JSONdata.data.songs
+        })
+      })
   }
 
   render() {
@@ -42,8 +67,8 @@ class App extends Component {
           </div>
         </div> 
         <div className="row justify-content-center">
-          {this.generateQuote()}
-        {/* {this.state.wisdom ? <h1>{this.state.wisdom}</h1> : <Card></Card>} */}
+          {this.state.hasQuote ? <Card
+          title={this.state.title} quote={this.state.quote} tags={this.state.tags}/> : '' }
         </div>
       </div>
     );
